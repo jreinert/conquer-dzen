@@ -1,6 +1,14 @@
 module Conquer
   module Dzen
     module Positioning
+      def ignore_bg(state = :on)
+        if block_given?
+          "^ib(1)#{yield}^ib(0)"
+        else
+          "^ib(#{state == :on ? 0 : 1})"
+        end
+      end
+
       def lock_x(options = {})
         if block_given?
           "#{'^ib(1)' if options[:ignore_bg]}" \
@@ -15,8 +23,8 @@ module Conquer
         '^p(_UNLOCK_X)'
       end
 
-      def shift(x, y)
-        return "#{shift(x, y)}#{yield}#{shift(-x, -y)}" if block_given?
+      def shift(x, y = 0)
+        return "#{shift(x, y)}#{yield}#{shift(-x)}^p()" if block_given?
         x = x.round
         y = y.round
         x = nil if x == 0
